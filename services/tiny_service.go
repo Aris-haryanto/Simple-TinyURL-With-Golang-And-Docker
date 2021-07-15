@@ -30,18 +30,19 @@ func (ts *TinyService) Store(param api.TinyStore) api.ResStore {
 		}
 	}
 
+	shortCode := param.Shortcode
+	if param.Shortcode == "" {
+		shortCode = ts.RandomShort()
+	}
+
 	checkShort := regexp.MustCompile("^[0-9a-zA-Z_]{6}$")
-	if checkShort.MatchString(param.Shortcode) {
+	if checkShort.MatchString(shortCode) != true {
 		return api.ResStore{
 			HttpCode:    422,
 			Description: "The shortcode fails to meet the following regexp: ^[0-9a-zA-Z_]{6}$.",
 		}
 	}
 
-	shortCode := param.Shortcode
-	if param.Shortcode == "" {
-		shortCode = ts.RandomShort()
-	}
 	ts.tinyList = append(ts.tinyList, api.TinyStore{
 		Url:           param.Url,
 		Shortcode:     shortCode,

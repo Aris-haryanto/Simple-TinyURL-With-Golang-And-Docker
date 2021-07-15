@@ -8,9 +8,30 @@ import (
 
 var (
 	ts        services.TinyService
-	shortcode = "clickbait"
+	shortcode = "20ACad"
 	url       = "www.google.com"
 )
+
+func TestCreateShortcodeWithoutURL(t *testing.T) {
+	got := ts.Store(api.TinyStore{
+		Shortcode: shortcode,
+	})
+	want := 400
+	if got.HttpCode != want {
+		t.Errorf("got %q, wanted %q", got, want)
+	}
+}
+
+func TestCreateShortcodeWithInvalidText(t *testing.T) {
+	got := ts.Store(api.TinyStore{
+		Url:       url,
+		Shortcode: "#dT4&@324",
+	})
+	want := 422
+	if got.HttpCode != want {
+		t.Errorf("got %q, wanted %q", got, want)
+	}
+}
 
 // create shortcode
 func TestCreateShortcode(t *testing.T) {
@@ -19,6 +40,28 @@ func TestCreateShortcode(t *testing.T) {
 		Shortcode: shortcode,
 	})
 	want := 200
+	if got.HttpCode != want {
+		t.Errorf("got %q, wanted %q", got, want)
+	}
+}
+
+// create shortcode
+func TestCreateTinyWithoutShortcode(t *testing.T) {
+	got := ts.Store(api.TinyStore{
+		Url: url,
+	})
+	want := 200
+	if got.HttpCode != want {
+		t.Errorf("got %q, wanted %q", got, want)
+	}
+}
+
+func TestCreateDuplicateShortcode(t *testing.T) {
+	got := ts.Store(api.TinyStore{
+		Url:       url,
+		Shortcode: shortcode,
+	})
+	want := 409
 	if got.HttpCode != want {
 		t.Errorf("got %q, wanted %q", got, want)
 	}
