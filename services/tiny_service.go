@@ -69,7 +69,7 @@ func (ts *TinyService) Get(shortcode string) api.ResGet {
 		ts.Log()
 
 		return api.ResGet{
-			HttpCode: 200,
+			HttpCode: 302,
 			Location: v.Url,
 		}
 	}
