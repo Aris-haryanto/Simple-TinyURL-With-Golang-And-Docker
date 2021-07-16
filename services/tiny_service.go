@@ -87,10 +87,10 @@ func (ts *TinyService) Stats(shortcode string) api.ResStats {
 		var setStats api.ResStats
 		setStats.HttpCode = 200
 		setStats.StartDate = v.StartDate
-		setStats.LastSeenDate = v.LastSeenDate
+		setStats.RedirectCount = v.RedirectCount
 
 		if v.RedirectCount > 0 {
-			setStats.RedirectCount = v.RedirectCount
+			setStats.LastSeenDate = v.LastSeenDate
 		}
 
 		return setStats

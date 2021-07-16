@@ -13,7 +13,7 @@ type ResGet struct {
 type ResStats struct {
 	HttpCode      int    `json:"-"`
 	Description   string `json:"description,omitempty"`
-	StartDate     string `json:"startDate"`
-	LastSeenDate  string `json:"lastSeenDate"`
-	RedirectCount int    `json:"redirectCount,omitempty"`
+	StartDate     string `json:"startDate,omitempty"`
+	LastSeenDate  string `json:"lastSeenDate,omitempty"`
+	RedirectCount int    `json:"redirectCount"`
 }
