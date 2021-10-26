@@ -1,6 +1,7 @@
 package test
 
 import (
+	"reflect"
 	"testing"
 	"tinyurl/api"
 	"tinyurl/services"
@@ -80,7 +81,8 @@ func TestShortcodeStats(t *testing.T) {
 func TestShortcodeStatsWithNoRedirect(t *testing.T) {
 	got := ts.Stats(shortcode)
 	want := 0
-	if got.RedirectCount > want {
+	refVal := reflect.ValueOf(got.Data).MapIndex(reflect.ValueOf("redirectCount")) //get (casting) response from object interface{}
+	if refVal.Interface().(int) > want {
 		t.Errorf("got %q, wanted %q", got, want)
 	}
 }
@@ -98,7 +100,8 @@ func TestGetShortcode(t *testing.T) {
 func TestShortcodeStatsWithRedirect(t *testing.T) {
 	got := ts.Stats(shortcode)
 	want := 1
-	if got.RedirectCount < want {
+	refVal := reflect.ValueOf(got.Data).MapIndex(reflect.ValueOf("redirectCount")) //get (casting) response from object interface{}
+	if refVal.Interface().(int) < want {
 		t.Errorf("got %q, wanted %q", got, want)
 	}
 }

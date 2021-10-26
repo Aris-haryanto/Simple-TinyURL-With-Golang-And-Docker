@@ -15,18 +15,20 @@ type TinyService struct {
 	tinyList []api.TinyStore
 }
 
-func (ts *TinyService) Store(param api.TinyStore) api.ResStore {
+func (ts *TinyService) Store(param api.TinyStore) api.Response {
 	if param.Url == "" {
-		return api.ResStore{
+		return api.Response{
 			HttpCode:    400,
 			Description: "url is not present",
+			Data:        "",
 		}
 	}
 
 	if _, _, err := ts.CheckShortcode(param.Shortcode); err == nil {
-		return api.ResStore{
+		return api.Response{
 			HttpCode:    409,
 			Description: "The the desired shortcode is already in use. Shortcodes are case-sensitive.",
+			Data:        "",
 		}
 	}
 
@@ -37,9 +39,10 @@ func (ts *TinyService) Store(param api.TinyStore) api.ResStore {
 
 	checkShort := regexp.MustCompile("^[0-9a-zA-Z_]{6}$")
 	if checkShort.MatchString(shortCode) != true {
-		return api.ResStore{
+		return api.Response{
 			HttpCode:    422,
 			Description: "The shortcode fails to meet the following regexp: ^[0-9a-zA-Z_]{6}$.",
+			Data:        "",
 		}
 	}
 
@@ -54,13 +57,17 @@ func (ts *TinyService) Store(param api.TinyStore) api.ResStore {
 	// print to cli
 	ts.Log()
 
-	return api.ResStore{
-		HttpCode:  200,
-		Shortcode: shortCode,
+	setStore := make(map[string]interface{}) //set custom response with interface
+	setStore["shortcode"] = shortCode
+
+	return api.Response{
+		HttpCode:    200,
+		Description: "Success",
+		Data:        setStore,
 	}
 }
 
-func (ts *TinyService) Get(shortcode string) api.ResGet {
+func (ts *TinyService) Get(shortcode string) api.Response {
 	if k, v, err := ts.CheckShortcode(shortcode); err == nil {
 		// Update lastSeen and Redirect
 		ts.tinyList[k].LastSeenDate = time.Now().Format(time.RFC3339)
@@ -69,36 +76,45 @@ func (ts *TinyService) Get(shortcode string) api.ResGet {
 		// print to cli
 		ts.Log()
 
-		return api.ResGet{
-			HttpCode: 302,
-			Location: v.Url,
+		setUrl := make(map[string]interface{}) //set custom response with interface
+		setUrl["location"] = v.Url
+
+		return api.Response{
+			HttpCode:    302,
+			Description: "Success",
+			Data:        setUrl,
 		}
 	}
 
-	return api.ResGet{
+	return api.Response{
 		HttpCode:    404,
 		Description: "The shortcode cannot be found in the system",
+		Data:        "",
 	}
 }
 
-func (ts *TinyService) Stats(shortcode string) api.ResStats {
+func (ts *TinyService) Stats(shortcode string) api.Response {
 	if _, v, err := ts.CheckShortcode(shortcode); err == nil {
 
-		var setStats api.ResStats
-		setStats.HttpCode = 200
-		setStats.StartDate = v.StartDate
-		setStats.RedirectCount = v.RedirectCount
+		setStats := make(map[string]interface{}) //set custom response with interface
+
+		setStats["redirectCount"] = v.RedirectCount
 
 		if v.RedirectCount > 0 {
-			setStats.LastSeenDate = v.LastSeenDate
+			setStats["LastSeenDate"] = v.LastSeenDate
 		}
 
-		return setStats
+		return api.Response{
+			HttpCode:    200,
+			Description: "Success",
+			Data:        setStats,
+		}
 	}
 
-	return api.ResStats{
+	return api.Response{
 		HttpCode:    404,
 		Description: "The shortcode cannot be found in the system",
+		Data:        "",
 	}
 }
 
